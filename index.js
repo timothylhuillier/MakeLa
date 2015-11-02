@@ -10,19 +10,32 @@ app.use(express.static(__dirname + '/public'));
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
+// affiche la liste des pizzas
 app.get('/', function(req, resp) {
-  response.render('pages/index');
-});
 
-app.get('/pizzas', function(req, resp) {
-
-  request('https://pizzapi.herokuapp.com/pizzas', function (err, response, body) {
+  request('https://pizzapi.herokuapp.com/pizzas', function (err, httpResponse, body) {
     if (err) {
       console.log(err, err.stack); // an error occurred
     }
 
-    var listPizzas = {pizzas : JSON.parse(response.body)};
+    var listPizzas = {pizzas : JSON.parse(httpResponse.body)};
     resp.render('pages/pizzas', listPizzas);
+  });
+});
+
+// a middleware sub-stack which handles GET requests to /orders/:id
+app.get('/orders/:id', function (req, resp, next) {
+
+  request.post(
+    {url:'https://pizzapi.herokuapp.com/orders', 
+     json: {'id': parseInt(req.params.id)}
+    }, 
+    function(err,httpResponse,body){
+      if (err) {
+        console.log(err, err.stack); // an error occurred
+      } 
+      console.log(body);
+      resp.render('pages/order', {order: body});
   });
 });
 

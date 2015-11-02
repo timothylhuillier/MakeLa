@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../partials/header.ejs %>
+</head>
+
+<body>
+
+<% include ../partials/nav.ejs %>
+
+<div class="container">
+<h2>Commande : </h2>
+
+<p>
+	N° de commande : <b><%= order.id %></b>
+</p>
+<p>
+	Pizza commandé : <b><%= order.pizza.id %> - <%= order.pizza.name %> - <%= order.pizza.price %></b>
+</p>
+<p>
+	Status de la commande : <b><%= order.status %></b>
+</p>
+
+</div>
+
+</body>
+</html>

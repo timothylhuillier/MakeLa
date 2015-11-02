@@ -13,7 +13,7 @@
 
 <ul>
     <% pizzas.forEach(function(r) { %>
-        <li><%= r.id %> - <%= r.name %> - <%= r.price %></li>
+        <li><%= r.id %> - <%= r.name %> - <%= r.price %> <a href="/orders/<%= r.id %>" class="btn btn-primary btn-xs active" role="button">Commander</a></li>
     <% }); %>
 </ul>
 
