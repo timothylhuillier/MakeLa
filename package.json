@@ -11,7 +11,7 @@
     "express": "4.13.3",
     "request": "2.64.0",
     "redis": "2.x",
-    "circuitbreaker": "0.2.1"
+    "circuit-breaker-js": "0.0.1"
   },
   "engines": {
     "node": "4.2.1"

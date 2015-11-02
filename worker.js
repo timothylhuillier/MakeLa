@@ -1,23 +1,18 @@
 var request = require('request');
 var redis = require('redis').createClient(
-  process.env.REDIS_URL || 'redis://h:pct6t6lhpffn8n85j3b16lv5u3m@ec2-54-83-199-200.compute-1.amazonaws.com:15939');
+  process.env.REDIS_URL || 'redis://localhost:6379');
 
-
-var intervalObject = setInterval(function () {
+setInterval(function () {
   
-  request.get('https://pizzapi.herokuapp.com/pizzas', function (err, httpResponse, body) {
+  request.get('https://pizzapi.herokuapp.com/pizzas', {timeout: 3000}, function (err, httpResponse, body) {
 
     // s'il y a le timeout
-    if (err.code === 'ETIMEDOUT') {
-      console.log("timeout");
+    if (err || JSON.parse(body).id == "maintenance") {
+      console.log("timeout or maintenance");
     }
     else{
-      redis.set("listPizzas", httpResponse.body, redis.print);
+      redis.set("listPizzas", body, redis.print);
     }
-
-    client.get('listPizzas');
   });
 
-}, 1000);
-
-clearInterval(intervalObject);
+}, 10000);
