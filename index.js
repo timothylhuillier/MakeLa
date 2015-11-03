@@ -3,7 +3,10 @@ var request = require('request');
 var app = express();
 
 var CircuitBreaker = require('circuit-breaker-js');
-var breaker = new CircuitBreaker({numBuckets: 3});
+var breaker = new CircuitBreaker({
+  numBuckets: 3, 
+  windowDuration: 100000,
+  volumeThreshold: 2});
 
 var redis = require('redis').createClient(
   process.env.REDIS_URL || 'redis://localhost:6379');
@@ -15,6 +18,11 @@ app.use(express.static(__dirname + '/public'));
 // views is directory for all template files
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
+
+breaker.onCircuitOpen = function (metrics){
+
+  console.log(metrics);
+};
 
 
 // affiche la liste des pizzas
