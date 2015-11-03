@@ -24,10 +24,15 @@ app.get('/', function(req, resp) {
 
     var returned = {pizzas : null,
                     available: false};
+
+    // si le circuit breaker est fermé (donc que l'api focntionne) 
+    if(!breaker.isOpen()){
+      returned.available = true;
+    } 
     console.log("breaker : " + breaker.isOpen())
 
-    // s'il y a le timeout
-    if (err || JSON.parse(body).id == "maintenance") {
+    // s'il y a le timeout ou id maintenance
+    if (err || httpResponse.statusCode == 503) {
       console.log(err);
       redis.get('listPizzas', function(err, reply) {
           returned.pizzas = JSON.parse(reply);
@@ -37,12 +42,9 @@ app.get('/', function(req, resp) {
     }
     else{
       returned.pizzas = JSON.parse(httpResponse.body);
-      // si le circuit breaker est fermé (donc que l'api focntionne) 
-      if(!breaker.isOpen()){
-        returned.available = true;
-      } 
+      resp.render('pages/pizzas', returned);
+      return;
     }
-    resp.render('pages/pizzas', returned);
   });
 });
 
@@ -52,18 +54,20 @@ app.get('/orders/:id', function (req, resp, next) {
   var command = function(success, failure) {
     request.post(
       {url:'https://pizzapi.herokuapp.com/orders', 
-      json: {'id': parseInt(req.params.id)}
-      }, 
-      function(err,httpResponse,body){
-      if (err) {
+       json: {'id': parseInt(req.params.id)}
+      },function(err, httpResponse, body){
+      if (err || httpResponse.statusCode == 503) {
+        console.log("failure");
         failure();
-        console.log(err, err.stack); // an error occurred
-        // process.exit(0);
+        resp.render('pages/fail', 
+                    {errors: err, statusMessage: httpResponse.statusMessage});
+        return; 
       } else {
         success();
-      }
-      console.log(body);
-      resp.render('pages/order', {order: body});
+        console.log("success");
+        resp.render('pages/order', {order: body});
+        return; 
+      }      
     });
   }
 
