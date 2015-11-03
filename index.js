@@ -67,8 +67,7 @@ app.get('/orders/:id', function (req, resp, next) {
       if (err || httpResponse.statusCode == 503) {
         console.log("failure");
         failure();
-        resp.render('pages/fail', 
-                    {errors: err, statusMessage: httpResponse.statusMessage});
+        resp.render('pages/fail', {err: err});
         return; 
       } else {
         success();
